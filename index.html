@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pac-Man AI — Browser Port</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="game-wrap" aria-label="Pac-Man game">
+      <header class="hud">
+        <div><span class="hud-label">SCORE</span><span id="score">00000</span></div>
+        <div><span class="hud-label">HIGH SCORE</span><span id="highScore">00000</span></div>
+        <div><span class="hud-label">LEVEL</span><span id="level">1</span><span id="levelName" class="hud-sub">Classic</span></div>
+      </header>
+
+      <div class="canvas-wrap">
+        <canvas id="game" width="672" height="864" aria-label="Pac-Man maze"></canvas>
+        <div id="overlay" class="overlay">
+          <div id="overlayText" class="overlay-text">SELECT A LEVEL, THEN START AI</div>
+        </div>
+      </div>
+
+      <section class="launch-panel" aria-label="Game start options">
+        <div class="launch-copy">
+          <span class="hud-label">START LEVEL</span>
+          <strong>Choose a maze and let the AI play.</strong>
+        </div>
+        <label class="level-select-wrap" for="startLevelSelect">
+          <span class="sr-only">Starting level</span>
+          <select id="startLevelSelect" aria-label="Starting level">
+            <option value="1">Level 1 — Classic</option>
+            <option value="2">Level 2 — Crossroads</option>
+          </select>
+        </label>
+        <button id="startBtn" class="primary-btn" type="button">Start AI</button>
+      </section>
+
+      <footer class="game-footer">
+        <div class="lives-block">
+          <span class="hud-label">LIVES</span>
+          <span id="lives" class="lives"></span>
+        </div>
+        <div class="controls">
+          <button id="pauseBtn" type="button">Pause</button>
+          <button id="restartBtn" type="button">Restart Run</button>
+          <button id="simulationBtn" type="button">Simulation</button>
+          <div class="speed-controls" aria-label="Playback speed">
+            <button id="speedDownBtn" type="button" aria-label="Decrease playback speed">−</button>
+            <span id="speedLabel" class="speed-label" aria-live="polite">1×</span>
+            <button id="speedUpBtn" type="button" aria-label="Increase playback speed">+</button>
+          </div>
+          <button id="muteBtn" type="button">Sound: On</button>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="info">
+      <h1>Pac-Man AI Browser Port</h1>
+      <p>This version is fully AI-controlled. Choose <strong>Level 1</strong> or <strong>Level 2</strong> in the Start Level menu, then press <strong>Start AI</strong>. Pac-Man cannot be controlled with the keyboard. If you start on Level 1, clearing it still advances automatically to <strong>Level 2: Crossroads</strong>. The −/+ controls change playback speed only (0.5× to 4×).</p>
+
+      <div class="ai-status" aria-live="polite">
+        <h2>AI Status</h2>
+        <div><span>FSM State</span><strong id="aiState">COLLECT</strong></div>
+        <div><span>Behavior</span><strong id="aiBehavior">WAITING</strong></div>
+        <div><span>Target</span><strong id="aiTarget">—</strong></div>
+        <div><span>Utility</span><strong id="aiUtility">—</strong></div>
+      </div>
+
+      <div class="ai-status ghost-status" aria-live="polite">
+        <h2>Ghost Behavior Trees</h2>
+        <div><span>Blinky</span><strong id="ghostBlinky">HOME_WAIT</strong></div>
+        <div><span>Pinky</span><strong id="ghostPinky">HOME_WAIT</strong></div>
+        <div><span>Inky</span><strong id="ghostInky">HOME_WAIT</strong></div>
+        <div><span>Clyde</span><strong id="ghostClyde">HOME_WAIT</strong></div>
+      </div>
+
+      <p class="small"><strong>Pac-Man AI:</strong> context-driven FSM → Behavior Tree → Hybrid Reward Architecture utility scoring → A* movement. Ghost clustering is handled in the SETUP branch before a power pellet is consumed.</p>
+      <p class="small"><strong>Ghost AI:</strong> every ghost uses a Behavior Tree with Home, Frightened, Scatter, and Chase branches; each ghost has a different Chase mechanic.</p>
+      <p class="small">The game still exposes <code>window.pacmanGame</code> and <code>getState()</code> for later experiments and evaluation.</p>
+    </aside>
+  </main>
+
+  <section id="simulationPanel" class="simulation-panel hidden" aria-labelledby="simulationTitle">
+    <div class="simulation-head">
+      <div>
+        <h2 id="simulationTitle">Simulation</h2>
+        <p>Run the Pac-Man AI invisibly on Level 1 and Level 2. Each level is simulated independently with 3 lives so the score distributions are directly comparable.</p>
+      </div>
+      <button id="simulationCloseBtn" type="button">Close</button>
+    </div>
+
+    <div class="simulation-controls">
+      <label for="simulationCount">Runs per level</label>
+      <select id="simulationCount">
+        <option value="100">100</option>
+        <option value="500">500</option>
+        <option value="1000">1,000</option>
+      </select>
+      <button id="simulationRunBtn" type="button">Run Simulations</button>
+      <button id="simulationCancelBtn" type="button" disabled>Cancel</button>
+    </div>
+
+    <div class="simulation-progress-wrap">
+      <div id="simulationProgressText" aria-live="polite">Ready.</div>
+      <progress id="simulationProgress" value="0" max="1"></progress>
+    </div>
+
+    <div id="simulationResults" class="simulation-results hidden">
+      <article class="hist-card">
+        <h3>Level 1 Score Distribution</h3>
+        <div class="sim-stats">
+          <div><span>Average</span><strong id="simL1Avg">—</strong></div>
+          <div><span>Low</span><strong id="simL1Low">—</strong></div>
+          <div><span>Max</span><strong id="simL1Max">—</strong></div>
+          <div><span>Cleared</span><strong id="simL1Clear">—</strong></div>
+        </div>
+        <canvas id="simL1Histogram" width="720" height="300" aria-label="Histogram of Level 1 simulation scores"></canvas>
+      </article>
+
+      <article class="hist-card">
+        <h3>Level 2 Score Distribution</h3>
+        <div class="sim-stats">
+          <div><span>Average</span><strong id="simL2Avg">—</strong></div>
+          <div><span>Low</span><strong id="simL2Low">—</strong></div>
+          <div><span>Max</span><strong id="simL2Max">—</strong></div>
+          <div><span>Cleared</span><strong id="simL2Clear">—</strong></div>
+        </div>
+        <canvas id="simL2Histogram" width="720" height="300" aria-label="Histogram of Level 2 simulation scores"></canvas>
+      </article>
+    </div>
+  </section>
+
+  <script src="game.js"></script>
+  <script src="ai.js"></script>
+  <script src="simulation.js"></script>
+</body>
+</html>

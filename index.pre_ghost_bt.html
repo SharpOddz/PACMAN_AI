@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pac-Man AI — Browser Port</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="game-wrap" aria-label="Pac-Man game">
+      <header class="hud">
+        <div><span class="hud-label">SCORE</span><span id="score">00000</span></div>
+        <div><span class="hud-label">HIGH SCORE</span><span id="highScore">00000</span></div>
+        <div><span class="hud-label">LEVEL</span><span id="level">1</span></div>
+      </header>
+
+      <div class="canvas-wrap">
+        <canvas id="game" width="672" height="864" aria-label="Pac-Man maze"></canvas>
+        <div id="overlay" class="overlay">
+          <div id="overlayText" class="overlay-text">PRESS START</div>
+        </div>
+      </div>
+
+      <footer class="game-footer">
+        <div class="lives-block">
+          <span class="hud-label">LIVES</span>
+          <span id="lives" class="lives"></span>
+        </div>
+        <div class="controls">
+          <button id="startBtn" type="button">Start AI</button>
+          <button id="pauseBtn" type="button">Pause</button>
+          <button id="restartBtn" type="button">Restart</button>
+          <button id="muteBtn" type="button">Sound: On</button>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="info">
+      <h1>Pac-Man AI Browser Port</h1>
+      <p>This version is fully AI-controlled. Press <strong>Start AI</strong> to begin; Pac-Man cannot be controlled with the keyboard.</p>
+
+      <div class="ai-status" aria-live="polite">
+        <h2>AI Status</h2>
+        <div><span>FSM State</span><strong id="aiState">COLLECT</strong></div>
+        <div><span>Behavior</span><strong id="aiBehavior">WAITING</strong></div>
+        <div><span>Target</span><strong id="aiTarget">—</strong></div>
+        <div><span>Utility</span><strong id="aiUtility">—</strong></div>
+      </div>
+
+      <p class="small"><strong>AI structure:</strong> context-driven FSM → Behavior Tree → Hybrid Reward Architecture utility scoring → A* movement. Ghost clustering is handled in the SETUP branch before a power pellet is consumed.</p>
+      <p class="small">The game still exposes <code>window.pacmanGame</code> and <code>getState()</code> for later experiments and evaluation.</p>
+    </aside>
+  </main>
+
+  <script src="game.js"></script>
+  <script src="ai.js"></script>
+</body>
+</html>

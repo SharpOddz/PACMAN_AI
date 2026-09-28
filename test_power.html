@@ -1,0 +1,21 @@
+<!doctype html><html><body><canvas id="game" width="800" height="800"></canvas><div id="overlayText"></div>
+<div id="score"></div><div id="lives"></div><div id="level"></div>
+<button id="startBtn"></button><button id="pauseBtn"></button><button id="restartBtn"></button><button id="muteBtn"></button>
+<div id="aiState"></div><div id="aiBehavior"></div><div id="aiTarget"></div><div id="aiUtility"></div>
+<div id="ghostBlinky"></div><div id="ghostPinky"></div><div id="ghostInky"></div><div id="ghostClyde"></div>
+<pre id="result">WAIT</pre>
+<script src="game.js"></script><script src="ai.js"></script>
+<script>
+(async()=>{
+ for(let i=0;i<100 && !window.pacmanGame;i++) await new Promise(r=>setTimeout(r,25));
+ const g=window.pacmanGame;
+ if(!g){document.getElementById('result').textContent='NO_GAME';return;}
+ const p=[...g.grid.pellets.values()].find(x=>x.type==='power');
+ g.pacman.enabled=true; g.pacman.x=p.x; g.pacman.y=p.y;
+ const gh=g.ghosts[0]; gh.enabled=true; gh.x=p.x+3; gh.y=p.y; gh.leavingHome=null; gh.eatenEyes=false; gh.setState('Chasing', true);
+ g.tryEatPellet();
+ const f=g.aiController.features();
+ const state=g.aiController.fsm.choose(f);
+ document.getElementById('result').textContent=JSON.stringify({pelletEaten:p.eaten,remaining:g.maxPellets,fright:g.frightenedTimeRemaining(),ghostState:gh.state,fsm:state});
+})();
+</script></body></html>

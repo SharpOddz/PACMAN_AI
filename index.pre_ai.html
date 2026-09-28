@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pac-Man — Unity Port</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="game-wrap" aria-label="Pac-Man game">
+      <header class="hud">
+        <div><span class="hud-label">SCORE</span><span id="score">00000</span></div>
+        <div><span class="hud-label">HIGH SCORE</span><span id="highScore">00000</span></div>
+        <div><span class="hud-label">LEVEL</span><span id="level">1</span></div>
+      </header>
+
+      <div class="canvas-wrap">
+        <canvas id="game" width="672" height="864" aria-label="Pac-Man maze"></canvas>
+        <div id="overlay" class="overlay">
+          <div id="overlayText" class="overlay-text">PRESS START</div>
+        </div>
+      </div>
+
+      <footer class="game-footer">
+        <div class="lives-block">
+          <span class="hud-label">LIVES</span>
+          <span id="lives" class="lives"></span>
+        </div>
+        <div class="controls">
+          <button id="startBtn" type="button">Start</button>
+          <button id="pauseBtn" type="button">Pause</button>
+          <button id="restartBtn" type="button">Restart</button>
+          <button id="muteBtn" type="button">Sound: On</button>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="info">
+      <h1>Pac-Man Browser Port</h1>
+      <p>This is a JavaScript port of the supplied Unity project. The maze, scoring, ghost state timing, pellets, power pellets, tunnel teleporters, lives, and round resets follow the professor's base project.</p>
+      <p><strong>Controls:</strong> Arrow keys or WASD. Space stops Pac-Man. P pauses.</p>
+      <p class="small">For later AI work, the running game exposes <code>window.pacmanGame</code>, including <code>getState()</code>, <code>setAgent(fn)</code>, <code>clearAgent()</code>, <code>restart()</code>, <code>pause()</code>, and <code>resume()</code>.</p>
+    </aside>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
